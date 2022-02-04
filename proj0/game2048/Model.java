@@ -108,16 +108,57 @@ public class Model extends Observable {
      *    and the trailing tile does not.
      * */
     public boolean tilt(Side side) {
-        boolean changed;
-        changed = false;
+        boolean changed = false;
+        board.setViewingPerspective(side);
 
-        // TODO: Modify this.board (and perhaps this.score) to account
-        // for the tilt to the Side SIDE. If the board changed, set the
-        // changed local variable to true.
+        for (int col = 0; col < board.size(); col++) {
+            boolean result = tiltColumn(col);
+            changed = changed || result;
+        }
 
+        board.setViewingPerspective(Side.NORTH);
         checkGameOver();
         if (changed) {
             setChanged();
+        }
+        return changed;
+    }
+
+    /**
+     * Tilts the column at given index, and returns whether or not the board changed.
+     * This function is responsible for updating the score on each merge.
+     */
+    public boolean tiltColumn(int col) {
+        boolean changed = false;
+        // keeps track of the lowest row with a merge to prevent later merges on the same square
+        int lowestMergeRow = board.size();
+
+        // Start at the second to top row, and work our way down
+        for (int row = board.size()-2; row >= 0; row--) {
+            Tile t = board.tile(col, row);
+            if (t == null) continue;
+
+            // find the highest row this tile can be moved or merged to without being obstructed
+            int moveRow = row;
+            for (int tryMoveRow = row+1; tryMoveRow < board.size(); tryMoveRow++) {
+                Tile occupyingTile = board.tile(col, tryMoveRow);
+                if (    tryMoveRow >= lowestMergeRow
+                    ||  (occupyingTile != null && occupyingTile.value() != t.value())) {
+                    //we cannot move beyond this point, so our previous moveRow is where we'll move
+                    break;
+                }
+                moveRow = tryMoveRow;
+            }
+
+            // move the tile to that row; if a merge happened, increment the score
+            boolean merge = board.move(col, moveRow, t);
+            if (merge) {
+                score += board.tile(col, moveRow).value();
+                lowestMergeRow = moveRow;
+            }
+
+            // finally, if our moveRow is different from the initial row, set changed
+            changed = changed || row != moveRow;
         }
         return changed;
     }
