@@ -25,23 +25,26 @@ public class TimeSLList {
         // TODO: YOUR CODE HERE
         AList<Integer> ns = new AList<>();
         AList<Double> times = new AList<>();
+        AList<Integer> ops = new AList<>();
+        final int OPS = 10000;
 
         for (int i = 1; i <= 128; i*=2) {
-            int ops = 1000 * i;
+            int n = 1000 * i;
             Stopwatch s = new Stopwatch();
 
             SLList<Integer> test = new SLList<>();
-            for (int op = 0; op < ops; op++) {
+            for (int op = 0; op < n; op++) {
                 test.addLast(op);
             }
 
             double time = s.elapsedTime();
 
-            ns.addLast(ops);
+            ns.addLast(n);
             times.addLast(time);
+            ops.addLast(OPS);
         }
 
-        printTimingTable(ns, times, ns);
+        printTimingTable(ns, times, ops);
     }
 
 }
