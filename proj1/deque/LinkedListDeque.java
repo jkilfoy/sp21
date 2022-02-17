@@ -14,6 +14,7 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
         size = 0;
     }
 
+    @Override
     public void addFirst(T item) {
         Node<T> oldFirst = sentinel.getNext();
         Node<T> newNode = new Node<>(item, sentinel, oldFirst);
@@ -22,6 +23,7 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
         size++;
     }
 
+    @Override
     public void addLast(T item) {
         Node<T> oldLast = sentinel.getPrev();
         Node<T> newNode = new Node<>(item, oldLast, sentinel);
@@ -30,14 +32,12 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
         size++;
     }
 
-    public boolean isEmpty() {
-        return size == 0;
-    }
-
+    @Override
     public int size() {
         return size;
     }
 
+    @Override
     public void printDeque() {
         StringBuilder result = new StringBuilder();
         String prefix = "";
@@ -48,6 +48,7 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
         System.out.println(result);
     }
 
+    @Override
     public T removeFirst() {
         if (isEmpty()) return null;
         Node<T> node = sentinel.getNext();
@@ -58,6 +59,7 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
         return node.getValue();
     }
 
+    @Override
     public T removeLast() {
         if (isEmpty()) return null;
         Node<T> node = sentinel.getPrev();
@@ -68,6 +70,7 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
         return node.getValue();
     }
 
+    @Override
     public T get(int index) {
         Node<T> node = sentinel;
         for (int i = 0; i < size; i++) {
@@ -89,10 +92,12 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
         return getRecursiveHelper(--index, curr.getNext());
     }
 
+    @Override
     public Iterator<T> iterator() {
         return new DequeIterator<>(this);
     }
 
+    @Override
     public boolean equals(Object o) {
         if (!(o instanceof LinkedListDeque)) return false;
         LinkedListDeque<T> other = (LinkedListDeque<T>) o;
