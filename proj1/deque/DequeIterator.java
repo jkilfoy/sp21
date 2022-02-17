@@ -5,14 +5,16 @@ import java.util.Iterator;
 public class DequeIterator<T> implements Iterator<T> {
 
     private final Deque<T> deque;
+    private int index;
 
     public DequeIterator(Deque<T> tempDeque) {
         deque = tempDeque;
+        index = 0;
     }
 
     @Override
     public boolean hasNext() {
-        return deque.get(0) != null;
+        return deque.get(index) != null;
     }
 
     @Override
@@ -20,6 +22,8 @@ public class DequeIterator<T> implements Iterator<T> {
         if (!hasNext()) {
             return null;
         }
-        return deque.removeFirst();
+        T item = deque.get(index);
+        index++;
+        return item;
     }
 }

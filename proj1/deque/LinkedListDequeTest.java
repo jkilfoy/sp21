@@ -1,5 +1,6 @@
 package deque;
 
+import edu.princeton.cs.algs4.StdRandom;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -110,5 +111,71 @@ public class LinkedListDequeTest {
         for (double i = 999999; i > 500000; i--) {
             assertEquals("Should have the same value", i, (double) lld1.removeLast(), 0.0);
         }
+    }
+
+    @Test
+    public void lldEqualsAd() {
+        LinkedListDeque<Integer> lld1 = new LinkedListDeque<Integer>();
+        ArrayDeque<Integer> ad1 = new ArrayDeque<>();
+
+        for (int op = 0; op < 1000; ) {
+            int randInt = StdRandom.discrete(new int[]{16, 16, 1, 1, }) + 1;
+            if (randInt == 1) {
+                int add = StdRandom.uniform(1000);
+                ad1.addLast(add);
+                lld1.addLast(add);
+            }
+            if (randInt == 2) {
+                int add = StdRandom.uniform(1000);
+                ad1.addFirst(add);
+                lld1.addFirst(add);
+            }
+            if (randInt == 3) {
+                ad1.removeLast();
+                lld1.removeLast();
+            }
+            if (randInt == 4) {
+                ad1.removeFirst();
+                lld1.removeFirst();
+            }
+            op++;
+        }
+
+        assertEquals(lld1, ad1);
+        lld1.addFirst(100);
+        assertNotEquals(lld1, ad1);
+    }
+
+    @Test
+    public void twoIterators() {
+        LinkedListDeque<Integer> lld = new LinkedListDeque<>();
+        for (int i = 10; i < 1000; i += 11) {
+            lld.addFirst(i);
+        }
+        int ops = 0;
+        int totalOps = lld.size() * lld.size();
+        for (Integer i : lld) {
+            for (Integer j : lld) {
+                ops++;
+            }
+        }
+        assertEquals(ops, totalOps);
+    }
+
+    @Test
+    public void manyIterator() {
+        LinkedListDeque<Integer> lld = new LinkedListDeque<>();
+        for (int i = 1; i <= 100; i++) {
+            lld.addFirst(i);
+        }
+        int iterators = StdRandom.uniform(100) + 1;
+        int ops = 0;
+        int totalOps = lld.size() * iterators;
+        for (int i = 0; i < iterators; i++) {
+            for (Integer j : lld) {
+                ops++;
+            }
+        }
+        assertEquals(ops, totalOps);
     }
 }
