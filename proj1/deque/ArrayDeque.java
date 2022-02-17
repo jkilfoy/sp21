@@ -82,7 +82,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>  {
         lastIndex = size - 1;
     }
 
-    enum ResizeType {
+    private enum ResizeType {
         INCREASE, DECREASE;
     }
 
@@ -143,5 +143,18 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>  {
     @Override
     public Iterator<T> iterator() {
         return new DequeIterator<>(this);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Deque)) return false;
+        Deque<T> other = (Deque<T>) o;
+        if (size() != other.size()) return false;
+        for (int i = 0; i < size(); i++) {
+            if (!get(i).equals(other.get(i))) {
+                return false;
+            }
+        }
+        return true;
     }
 }

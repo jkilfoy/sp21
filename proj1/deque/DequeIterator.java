@@ -6,8 +6,8 @@ public class DequeIterator<T> implements Iterator<T> {
 
     private final Deque<T> deque;
 
-    public DequeIterator(Deque<T> _deque) {
-        deque = _deque;
+    public DequeIterator(Deque<T> tempDeque) {
+        deque = tempDeque;
     }
 
     @Override

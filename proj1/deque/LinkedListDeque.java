@@ -50,7 +50,9 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
 
     @Override
     public T removeFirst() {
-        if (isEmpty()) return null;
+        if (isEmpty()) {
+            return null;
+        }
         Node<T> node = sentinel.getNext();
         Node<T> newFirst = node.getNext();
         sentinel.setNext(newFirst);
@@ -61,7 +63,9 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
 
     @Override
     public T removeLast() {
-        if (isEmpty()) return null;
+        if (isEmpty()) {
+            return null;
+        }
         Node<T> node = sentinel.getPrev();
         Node<T> newLast = node.getPrev();
         sentinel.setPrev(newLast);
@@ -83,12 +87,16 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
     }
 
     public T getRecursive(int index) {
-        if (isEmpty() || index < 0) return null;
+        if (isEmpty() || index < 0) {
+            return null;
+        }
         return getRecursiveHelper(index, sentinel.getNext()).getValue();
     }
 
     private Node<T> getRecursiveHelper(int index, Node<T> curr) {
-        if (index == 0) return curr;
+        if (index == 0) {
+            return curr;
+        }
         return getRecursiveHelper(--index, curr.getNext());
     }
 
@@ -99,9 +107,13 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof LinkedListDeque)) return false;
-        LinkedListDeque<T> other = (LinkedListDeque<T>) o;
-        if (size() != other.size()) return false;
+        if (!(o instanceof Deque)) {
+            return false;
+        }
+        Deque<T> other = (Deque<T>) o;
+        if (size() != other.size()) {
+            return false;
+        }
         for (int i = 0; i < size(); i++) {
             if (!get(i).equals(other.get(i))) {
                 return false;

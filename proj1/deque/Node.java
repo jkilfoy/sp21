@@ -6,34 +6,34 @@ public class Node<T> {
     private Node<T> prev;
     private Node<T> next;
 
-    public Node(T _value, Node<T> _prev, Node<T> _next) {
-        value = _value;
-        prev = _prev;
-        next = _next;
+    public Node(T tempValue, Node<T> tempPrev, Node<T> tempNext) {
+        value = tempValue;
+        prev = tempPrev;
+        next = tempNext;
     }
 
     public T getValue() {
         return value;
     }
 
-    public void setValue(T _value) {
-        value = _value;
+    public void setValue(T tempValue) {
+        value = tempValue;
     }
 
     public Node<T> getPrev() {
         return prev;
     }
 
-    public void setPrev(Node<T> _prev) {
-        prev = _prev;
+    public void setPrev(Node<T> tempPrev) {
+        prev = tempPrev;
     }
 
     public Node<T> getNext() {
         return next;
     }
 
-    public void setNext(Node<T> _next) {
-        next = _next;
+    public void setNext(Node<T> tempNext) {
+        next = tempNext;
     }
 
 }
