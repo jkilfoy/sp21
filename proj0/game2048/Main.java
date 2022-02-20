@@ -10,7 +10,7 @@ import ucb.util.CommandArgs;
 public class Main {
 
     /** Number of squares on the side of a board. */
-    static final int BOARD_SIZE = 4;
+    static final int BOARD_SIZE = 10;
     /** Probability of choosing 2 as random tile (as opposed to 4). */
     static final double TILE2_PROBABILITY = 0.9;
 
