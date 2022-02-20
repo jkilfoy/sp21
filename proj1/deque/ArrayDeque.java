@@ -51,7 +51,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>  {
             resize(ResizeType.INCREASE);
         }
         if (!isEmpty()) {
-            // Decrease and cycle lastIndex only if the array is non-empty
+            // Increase and cycle lastIndex only if the array is non-empty
             lastIndex = cycle(lastIndex+1);
         }
         deque[lastIndex] = item;
@@ -60,8 +60,8 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>  {
 
     /**
      * Resizes the deque array. The deque cannot be empty when resizing, or else the first/last
-     *  pointers will desynchronize
-     * @param resizeType
+     *  pointers will de-synchronize (ie cross each other)
+     * @param resizeType Whether to increase of ddcrease the size
      */
     private void resize(ResizeType resizeType) {
         assert !isEmpty() : "Cannot resize when empty";
@@ -71,7 +71,8 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>  {
             case INCREASE -> newLength = (int) (size * INCREASE_SIZE_FACTOR);
         }
 
-        // Starting from firstIndex, fill the front of the new array
+        // Make an array with the new length, and Starting from firstIndex,
+        // fill the front of the new array with the elements in the deque
         T[] newArray = (T[]) new Object[newLength];
         for (int i = 0; i < size; i++) {
             newArray[i] = deque[cycle(firstIndex + i)];
@@ -106,7 +107,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>  {
     public T removeFirst() {
         if (isEmpty()) return null;
         if (    size >= DECREASE_MIN
-            &&  size-1 < deque.length/DECREASE_SIZE_FACTOR) {
+            &&  size - 1 < deque.length / DECREASE_SIZE_FACTOR) {
             resize(ResizeType.DECREASE);
         }
         T item = deque[firstIndex];

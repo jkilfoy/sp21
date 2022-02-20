@@ -1,5 +1,6 @@
-package deque;
+package deque.test;
 
+import deque.ArrayDeque;
 import edu.princeton.cs.algs4.StdRandom;
 import org.junit.Test;
 
