@@ -61,7 +61,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>  {
     /**
      * Resizes the deque array. The deque cannot be empty when resizing, or else the first/last
      *  pointers will de-synchronize (ie cross each other)
-     * @param resizeType Whether to increase of ddcrease the size
+     * @param resizeType Whether to increase or ddcrease the size
      */
     private void resize(ResizeType resizeType) {
         assert !isEmpty() : "Cannot resize when empty";
