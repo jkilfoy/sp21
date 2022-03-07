@@ -74,7 +74,7 @@ A class representing a Branch in the repository. Contains a reference to the com
 
 ### StagingArea
 
-A class representing the StagingArea in the repository. Tracks which files have been added, modified and removed, and contains utility methods for updating the Staging Area. Maintains a reference to the directory `.gitlet/stage`, and a FolderManager for the blobs in `.gitlet/stage/staged_blobs`.
+A class representing the StagingArea in the repository. Tracks which files have been added, modified and removed, and contains utility methods for updating the Staging Area. 
 
 ####Fields
 
