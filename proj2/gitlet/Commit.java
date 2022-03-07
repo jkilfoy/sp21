@@ -1,26 +1,55 @@
 package gitlet;
 
-// TODO: any imports you need here
+import java.io.Serializable;
+import java.util.Date;
+import java.util.TreeMap;
 
-import java.util.Date; // TODO: You'll likely use this in this class
-
-/** Represents a gitlet commit object.
- *  TODO: It's a good idea to give a description here of what else this Class
- *  does at a high level.
+/**
+ *  Represents a gitlet commit object.
+ *  This class contains all meta data pertinent to the commit, including its message,
+ *  its timestamp, its parent's id, and a map of filenames to the ids of blobs that hold them.
+ *  A commit is Digestable, and thus all its fields can be used to generate a SHA-1 digest.
+ *  A commit is immutable; none of its fields can change after being created. This is to
+ *  preserve the Digestable contract.
  *
- *  @author TODO
+ *  @author Jordan Kilfoy
  */
-public class Commit {
-    /**
-     * TODO: add instance variables here.
-     *
-     * List all instance variables of the Commit class here with a useful
-     * comment above them describing what that variable represents and how that
-     * variable is used. We've provided one example for `message`.
-     */
+public class Commit implements Digestable, Serializable {
 
     /** The message of this Commit. */
-    private String message;
+    private final String message;
 
-    /* TODO: fill in the rest of this class. */
+    /** The timestamp of this Commit. */
+    private final Date timestamp;
+
+    /** The SHA-1 digest of the parent commit. */
+    private final String parentId;
+
+    /** Maps the name of each file in the commit to the corresponding blob id */
+    private final TreeMap<String, String> blobs;
+
+    public Commit(String message, Date timestamp, String parentId, TreeMap<String, String> blobs) {
+        this.message = message;
+        this.timestamp = timestamp;
+        this.parentId = parentId;
+        this.blobs = blobs;
+    }
+
+    // Getters
+
+    public String getMessage() {
+        return message;
+    }
+
+    public Date getTimestamp() {
+        return timestamp;
+    }
+
+    public String getParentId() {
+        return parentId;
+    }
+
+    public TreeMap<String, String> getBlobs() {
+        return blobs;
+    }
 }
