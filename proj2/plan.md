@@ -1,10 +1,15 @@
 ### Plan for Gitlet project
 
+#### Data Strucutes
+
+1. XXX Write the Commit class
+2. XXX Write the Blob class
+3. XXX Write the Branch class
+
 #### Digestable
 
-1. Write the Digestable interface method `digest()`, which loops through the object's fields and produces a SHA-1 hash
-2. Write the Commit and Blob structues which implement Digestable
-3. TEST
+1. XXX Write the Digestable interface method `digest()`, which loops through the object's fields and produces a SHA-1 hash
+2. TEST
 
 #### Folder Manager
 
