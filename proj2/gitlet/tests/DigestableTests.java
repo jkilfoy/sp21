@@ -57,5 +57,16 @@ public class DigestableTests {
         Commit commit1 = new Commit("Hello", new Date(), "Uh ok", new TreeMap<>());
         Commit commit2 = new Commit("Hello", new Date(0), "Uh ok", new TreeMap<>());
         assertNotEquals("Objects with different fields should give different digests", commit1.digest(), commit2.digest());
+
+        TreeMap<String, String> map1 = new TreeMap<>();
+        TreeMap<String, String> map2 = new TreeMap<>();
+        for (int i = 1000; i < 20000; i+= 349) {
+            map1.put("" + i, "" + (i/4));
+            map2.put("l" + i, "" + (i/4)); // second map is different
+        }
+        Date now = new Date();
+        Commit commit = new Commit("same", now, "0123456789", map1);
+        Commit commitCopy = new Commit("same", now, "0123456789", map2);
+        assertNotEquals("Objects with different fields should give different digests", commit.digest(), commitCopy.digest());
     }
 }
