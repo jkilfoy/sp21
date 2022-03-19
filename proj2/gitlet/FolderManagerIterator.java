@@ -23,7 +23,7 @@ public class FolderManagerIterator<T extends Serializable> implements Iterator<T
 
     @Override
     public T next() {
-        T obj = folderManager.readObject(files.get(index));
+        T obj = folderManager.read(files.get(index));
         index++;
         return obj;
     }

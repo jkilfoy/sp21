@@ -26,12 +26,12 @@ public class FolderManager<T extends Serializable> implements Iterable<T> {
         return folder;
     }
 
-    public void writeObject(T obj, String fileName) {
+    public void persist(T obj, String fileName) {
         if (obj == null) return; // do not write null values
         Utils.writeObject(Utils.join(folder, fileName), obj);
     }
 
-    public T readObject(String fileName) {
+    public T read(String fileName) {
         if (!contains(fileName)) return null;
         return Utils.readObject(Utils.join(folder, fileName), type);
     }

@@ -60,9 +60,9 @@ public class FolderManagerTests {
         String fileName = "testfile1.txt";
         String fileContents = "This is the file contenteriwuyr q34n2807 ry bbqueiowhfc qiewuh cfuedwbfh iuh fo";
         assertFalse("File should not exist before it's written", stringFolderManager.contains(fileName));
-        stringFolderManager.writeObject(fileContents, fileName);
+        stringFolderManager.persist(fileContents, fileName);
         assertTrue("File should exist after writing", stringFolderManager.contains(fileName));
-        assertEquals("File contents should be readable", fileContents, stringFolderManager.readObject(fileName));
+        assertEquals("File contents should be readable", fileContents, stringFolderManager.read(fileName));
     }
 
     @Test
@@ -71,10 +71,10 @@ public class FolderManagerTests {
         String fileName = "file1";
         String fileContentsBefore = "hqwnfiouh2n0r8cxy2b3408r72y43078rcv2347089r 2340789r y2";
         String fileContentsAfter = "qirup92nu r98 23nh4priufhnqwe ";
-        stringFolderManager.writeObject(fileContentsBefore, fileName);
-        assertEquals("File should contain its initial contents", fileContentsBefore, stringFolderManager.readObject(fileName));
-        stringFolderManager.writeObject(fileContentsAfter, fileName);
-        assertEquals("File contents should be overwritten", fileContentsAfter, stringFolderManager.readObject(fileName));
+        stringFolderManager.persist(fileContentsBefore, fileName);
+        assertEquals("File should contain its initial contents", fileContentsBefore, stringFolderManager.read(fileName));
+        stringFolderManager.persist(fileContentsAfter, fileName);
+        assertEquals("File contents should be overwritten", fileContentsAfter, stringFolderManager.read(fileName));
     }
 
     @Test
@@ -82,12 +82,12 @@ public class FolderManagerTests {
         final int NUM_FILES = 500;
         stringFolderManager = new FolderManager<>(stringFolder, String.class);
         for (int i = 1; i <= NUM_FILES; i++) {
-            stringFolderManager.writeObject("" + i, "file" + i);
+            stringFolderManager.persist("" + i, "file" + i);
         }
         assertEquals("1000 files should exist", NUM_FILES, stringFolder.list().length);
 
         for (int i = 1; i <= NUM_FILES; i++) {
-            assertEquals("Each files should have correct contents", ""+i, stringFolderManager.readObject("file"+i));
+            assertEquals("Each files should have correct contents", ""+i, stringFolderManager.read("file"+i));
         }
 
         Map<String, Boolean> exists = new HashMap<>();
@@ -100,15 +100,15 @@ public class FolderManagerTests {
     @Test
     public void nullIfFileDoesntExist() {
         stringFolderManager = new FolderManager<>(stringFolder, String.class);
-        assertNull("Should return null if file doesn't exist", stringFolderManager.readObject("happyFace"));
+        assertNull("Should return null if file doesn't exist", stringFolderManager.read("happyFace"));
     }
 
     @Test
     public void cannotWriteNullValues() {
         stringFolderManager = new FolderManager<>(stringFolder, String.class);
         String fileName = "nullFile";
-        stringFolderManager.writeObject(null, fileName);
+        stringFolderManager.persist(null, fileName);
         assertFalse("Should not contain null file", stringFolderManager.contains(fileName));
-        assertNull("Should read null from non-existant file", stringFolderManager.readObject(fileName));
+        assertNull("Should read null from non-existant file", stringFolderManager.read(fileName));
     }
 }
