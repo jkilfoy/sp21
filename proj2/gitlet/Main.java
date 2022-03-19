@@ -1,9 +1,18 @@
 package gitlet;
 
-/** Driver class for Gitlet, a subset of the Git version-control system.
- *  @author TODO
+import java.io.File;
+
+/**
+ * Driver class for Gitlet, a subset of the Git version-control system.
+ *  @author Jordan Kilfoy
  */
 public class Main {
+
+    /** Current Working Directory. */
+    public static final File CWD = new File(System.getProperty("user.dir"));
+
+    /** Main metadata folder. */
+    public static final File GITLET_DIR = Utils.join(CWD, ".gitlet");
 
     /** Usage: java gitlet.Main ARGS, where ARGS contains
      *  <COMMAND> <OPERAND1> <OPERAND2> ... 
