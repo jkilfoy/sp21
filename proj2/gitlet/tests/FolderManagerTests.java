@@ -12,9 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static gitlet.Main.CWD;
 import static org.junit.Assert.*;
@@ -78,11 +76,20 @@ public class FolderManagerTests {
     }
 
     @Test
+    public void testDefaultFileNameUsingToString() {
+        stringFolderManager = new FolderManager<>(stringFolder, String.class);
+        String fileNameAndContents = "ImTheOne";
+        stringFolderManager.persist(fileNameAndContents);
+        assertTrue("Folder should contain the file", stringFolderManager.contains(fileNameAndContents));
+        assertEquals("File should contain the contents", fileNameAndContents, stringFolderManager.read(fileNameAndContents));
+    }
+
+    @Test
     public void testIteratingOverFilemanager() {
         final int NUM_FILES = 500;
-        stringFolderManager = new FolderManager<>(stringFolder, String.class);
+        stringFolderManager = new FolderManager<>(stringFolder, String.class, (s) -> "file" + s);
         for (int i = 1; i <= NUM_FILES; i++) {
-            stringFolderManager.persist("" + i, "file" + i);
+            stringFolderManager.persist("" + i);
         }
         assertEquals("1000 files should exist", NUM_FILES, stringFolder.list().length);
 
@@ -108,7 +115,15 @@ public class FolderManagerTests {
         stringFolderManager = new FolderManager<>(stringFolder, String.class);
         String fileName = "nullFile";
         stringFolderManager.persist(null, fileName);
-        assertFalse("Should not contain null file", stringFolderManager.contains(fileName));
-        assertNull("Should read null from non-existant file", stringFolderManager.read(fileName));
+        assertFalse("Folder should not contain null file", stringFolderManager.contains(fileName));
+        assertNull("Folder should read null from non-existant file", stringFolderManager.read(fileName));
+    }
+
+    @Test
+    public void readAndWriteCommitObjectWithDigestFilename() {
+        commitFolderManager = new FolderManager<>(commitFolder, Commit.class, Commit::digest);
+        Commit c1 = new Commit("Message1", new Date(), "12345", new TreeMap<>());
+        commitFolderManager.persist(c1);
+        assertTrue("Folder should contain the commit by digest fileName", commitFolderManager.contains(c1.digest()));
     }
 }
