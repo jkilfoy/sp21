@@ -22,18 +22,17 @@ public class FolderManagerTests {
     File testFolder;
     File stringFolder;
     File commitFolder;
-    File blobFolder;
     FolderManager<String> stringFolderManager;
     FolderManager<Commit> commitFolderManager;
-    FolderManager<Blob> blobFolderManager;
 
     @Before
     public void init() {
         testFolder = Utils.join(CWD, "test");
         testFolder.mkdir();
         stringFolder = Utils.join(testFolder, "strings");
+        stringFolder.mkdir();
         commitFolder = Utils.join(testFolder, "commits");
-        blobFolder = Utils.join(testFolder, "blobs");
+        commitFolder.mkdir();
     }
 
     @After
@@ -42,14 +41,6 @@ public class FolderManagerTests {
                 .sorted(Comparator.reverseOrder())
                 .map(Path::toFile)
                 .forEach(File::delete);
-    }
-
-
-    @Test
-    public void testCreate() {
-        assertFalse("Folder should not exist before FolderManager construction", stringFolder.exists());
-        stringFolderManager = new FolderManager<>(stringFolder, String.class);
-        assertTrue("Folder should exist after FolderManager construction", stringFolder.exists());
     }
 
     @Test

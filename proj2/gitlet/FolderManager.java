@@ -1,12 +1,8 @@
 package gitlet;
 
-import org.eclipse.jetty.util.StringUtil;
-
 import java.io.File;
 import java.io.Serializable;
-import java.lang.invoke.CallSite;
 import java.util.Iterator;
-import java.util.concurrent.Callable;
 import java.util.function.Function;
 
 public class FolderManager<T extends Serializable> implements Iterable<T> {
@@ -23,14 +19,6 @@ public class FolderManager<T extends Serializable> implements Iterable<T> {
         this.folder = folder;
         this.type = type;
         this.getFileName = getFileName;
-
-        if (!folder.exists()) {
-            try {
-                folder.mkdir();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     public File getFolder() {
