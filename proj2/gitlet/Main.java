@@ -63,6 +63,12 @@ public class Main {
                     StagingArea.add(args[1]);
                     break;
                 case "remove":
+                    verifyNumArguments(1, args.length - 1);
+                    StagingArea.remove(args[1]);
+                    break;
+                case "commit":
+                    verifyNumArguments(1, args.length - 1);
+                    Repository.commit(args[1]);
                     break;
 
             }

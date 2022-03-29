@@ -25,14 +25,14 @@ public class StagingArea {
      * from the "removed" file. */
     private static TreeSet<String> removed = null;
 
-    private static TreeMap<String, String> getAdded() {
+    public static TreeMap<String, String> getAdded() {
         if (added == null) {
             added = readObject(ADDED_FILE, TreeMap.class);
         }
         return added;
     }
 
-    private static TreeSet<String> getRemoved() {
+    public static TreeSet<String> getRemoved() {
         if (removed == null) {
             removed = readObject(REMOVED_FILE, TreeSet.class);
         }
@@ -41,8 +41,16 @@ public class StagingArea {
 
     // Persists the added and removed objects
     private static void persist() {
+        getAdded();
+        getRemoved();
         writeObject(ADDED_FILE, added);
         writeObject(REMOVED_FILE, removed);
+    }
+
+    private static void resetAddedAndRemoved() {
+        added = new TreeMap<>();
+        removed = new TreeSet<>();
+        persist();
     }
 
     /** Initializes the staging area */
@@ -50,9 +58,7 @@ public class StagingArea {
         assert !STAGE_DIR.exists() : "Tried to initialize a staging area inside a repo where it already exists";
         STAGE_DIR.mkdir();
         STAGED_BLOBS.getFolder().mkdir();
-        added = new TreeMap<>();
-        removed = new TreeSet<>();
-        persist();
+        resetAddedAndRemoved();
     }
 
     /** Adds a file from the CWD to the staging area */
@@ -64,7 +70,7 @@ public class StagingArea {
 
         // Clear the already staged version of the file if it exists
         if (getAdded().containsKey(filename)) {
-            STAGED_BLOBS.clear(filename);
+            STAGED_BLOBS.clear(getAdded().get(filename));
         }
 
         // Persist the blob in the staging area
@@ -77,5 +83,33 @@ public class StagingArea {
 
         // Persist the added and removed objects
         persist();
+    }
+
+    /** Removes a file from the staging area, and from the CWD provided
+     * it is tracked by the HEAD commit */
+    public static void remove(String filename) throws GitletException {
+        // Remove the file from the staging area
+        if (getAdded().containsKey(filename)) {
+            STAGED_BLOBS.clear(getAdded().get(filename));
+            getAdded().remove(filename);
+        }
+
+        // Stage the file for removal and remove it from CWD if it's tracked by the head commit
+        if (Repository.getHead().getCommit().getBlobs().containsKey(filename)) {
+            restrictedDelete(join(CWD, filename));
+            getRemoved().add(filename);
+        }
+
+        // Persist the added and removed objects
+        persist();
+    }
+
+    public static boolean isEmpty() {
+        return getAdded().isEmpty() && getRemoved().isEmpty();
+    }
+
+    public static void clear() {
+        STAGED_BLOBS.clearAll();
+        resetAddedAndRemoved();
     }
 }

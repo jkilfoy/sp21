@@ -57,6 +57,12 @@ public class FolderManager<T extends Serializable> implements Iterable<T> {
         }
     }
 
+    public void clearAll() {
+        for (String filename : plainFilenamesIn(folder)) {
+            clear(filename);
+        }
+    }
+
     @Override
     public Iterator<T> iterator() {
         return new FolderManagerIterator<>(this);

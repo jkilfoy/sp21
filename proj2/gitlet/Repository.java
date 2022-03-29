@@ -2,6 +2,7 @@ package gitlet;
 
 import java.io.File;
 import java.util.Date;
+import java.util.TreeMap;
 
 import static gitlet.Utils.*;
 import static gitlet.Main.*;
@@ -28,7 +29,7 @@ public class Repository {
     /** The head commit of the repository. Lazily loaded in its getter. */
     private static Branch head;
 
-    private static Branch getHead() {
+    public static Branch getHead() {
         if (head == null) {
             String headBranchName = readContentsAsString(HEAD_FILE);
             head = BRANCHES.read(headBranchName);
@@ -36,8 +37,8 @@ public class Repository {
         return head;
     }
 
-    private static void setHead(String branchName) {
-        assert BRANCHES.contains(branchName) : "Tried to set HEAD to a commit that does not exist";
+    public static void setHead(String branchName) {
+        assert BRANCHES.contains(branchName) : "Tried to set HEAD to a branch that does not exist";
         writeContents(HEAD_FILE, branchName);
         head = BRANCHES.read(branchName);
     }
@@ -67,5 +68,39 @@ public class Repository {
     }
 
 
+    /** Commits all changes inside the staging area */
+    public static void commit(String message) {
+        if (StagingArea.isEmpty()) {
+            throw new GitletException("No changes added to the commit.");
+        }
+        if ("".equals(message)) {
+            throw new GitletException("Please enter a commit message.");
+        }
 
+        // Copy all staged blobs to the tracked blobs directory
+        for (Blob blob : STAGED_BLOBS) {
+            TRACKED_BLOBS.persist(blob);
+        }
+
+        // Prepare the new commit's blobs treemap
+        Commit parentCommit = getHead().getCommit();
+        TreeMap<String, String> blobs = parentCommit.getBlobs();
+        for (String removedFilename : StagingArea.getRemoved()) {
+            blobs.remove(removedFilename);
+        }
+        for (String addedFilename : StagingArea.getAdded().navigableKeySet()) {
+            blobs.put(addedFilename, StagingArea.getAdded().get(addedFilename));
+        }
+
+        // Create and persist the new commit
+        Commit newCommit = new Commit(message, new Date(), parentCommit.digest(), blobs);
+        COMMITS.persist(newCommit);
+
+        // Update the commit of the HEAD branch
+        getHead().setCommitId(newCommit.digest());
+        BRANCHES.persist(getHead());
+
+        // Clear the staging area
+        StagingArea.clear();
+    }
 }
