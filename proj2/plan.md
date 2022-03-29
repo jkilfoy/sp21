@@ -9,34 +9,36 @@
 #### Digestable
 
 1. XXX Write the Digestable interface method `digest()`, which loops through the object's fields and produces a SHA-1 hash
-2. TEST
+2. XXX TEST
 
 #### Folder Manager
 
-1. Write the FolderManager\<T> class, which implements iterable 
-2. Write its constructor which takes the path name this will manage
-3. Write its three methods
-   1. persist(T obj, String filename) persists the given obj to the folder 
-   2. read(String filename) returns the deserialized T under the file name
-   3. iterator returns an iterator for each object in the folder
-4. TEST
+1. XXX Write the FolderManager\<T> class, which implements iterable 
+2. XXX Write its constructor which takes the path name this will manage
+3. XXX Write its three methods
+   1. XXX persist(T obj, String filename) persists the given obj to the folder 
+   2. XXX read(String filename) returns the deserialized T under the file name
+   3. XXX iterator returns an iterator for each object in the folder
+   --> ADDED contains and getFolder methods
+   --> ADDED capability to auto generate file names from object
+4. XXX TEST
 
 #### Static Fields
 
-1. Write the 7 Main public static fields (mostly directories and FolderManagers) of `Main`
-2. Add static field `HEAD` to Repository
-3. Write methods for setting/getting head (including lazy loading and auto persisting)
-4. Add static fields `added` and `removed` to StagingArea
-5. Write methods for setting/getting these (including lazy loading and auto persisting)
-6. TEST
+1. XXX Write the 7 Main public static fields (mostly directories and FolderManagers) of `Main`
+2. XXX Add static field `HEAD` to Repository
+3. XXX Write methods for setting/getting head (including lazy loading and auto persisting)
+4. XXX Add static fields `added` and `removed` to StagingArea
+5. XXX Write methods for setting/getting these (including lazy loading and auto persisting)
+6. NO TEST
 
 #### Init 
 
-1. Write `Repository.init` method
-2. In `Main.main` method, implement the following:
-   1. Verifies if a command was provided
-   2. If it was `init`, call `Repository.init()`
-3. Be sure to try / throw / catch and print error messages
+1. XXX Write `Repository.init` method
+2. XXX In `Main.main` method, implement the following:
+   1. XXX Verifies if a command was provided
+   2. XXX If it was `init`, call `Repository.init()`
+3. XXX Be sure to try / throw / catch and print error messages
 4. TEST
 
 #### Add, Remove and Commit

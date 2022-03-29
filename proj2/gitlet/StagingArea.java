@@ -32,7 +32,7 @@ public class StagingArea {
         return added;
     }
 
-    private static TreeSet<String> removed() {
+    private static TreeSet<String> getRemoved() {
         if (removed == null) {
             removed = readObject(REMOVED_FILE, TreeSet.class);
         }
@@ -52,6 +52,30 @@ public class StagingArea {
         STAGED_BLOBS.getFolder().mkdir();
         added = new TreeMap<>();
         removed = new TreeSet<>();
+        persist();
+    }
+
+    /** Adds a file from the CWD to the staging area */
+    public static void add(String filename) throws GitletException {
+        File file = join(CWD, filename);
+        if (!file.exists()) {
+            throw new GitletException("File does not exist.");
+        }
+
+        // Clear the already staged version of the file if it exists
+        if (getAdded().containsKey(filename)) {
+            STAGED_BLOBS.clear(filename);
+        }
+
+        // Persist the blob in the staging area
+        Blob staged_blob = new Blob(readContents(file), filename);
+        STAGED_BLOBS.persist(staged_blob);
+        getAdded().put(filename, staged_blob.digest());
+
+        // If the file was staged for removal, un-stage it for removal
+        getRemoved().remove(filename);
+
+        // Persist the added and removed objects
         persist();
     }
 }

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.function.Function;
+import static gitlet.Utils.*;
 
 /**
  * Utility class for easily reading, persisting and looping over serializable objects
@@ -36,16 +37,24 @@ public class FolderManager<T extends Serializable> implements Iterable<T> {
 
     public void persist(T obj, String fileName) {
         if (obj == null) return; // do not write null values
-        Utils.writeObject(Utils.join(folder, fileName), obj);
+        writeObject(join(folder, fileName), obj);
     }
 
     public T read(String fileName) {
         if (!contains(fileName)) return null;
-        return Utils.readObject(Utils.join(folder, fileName), type);
+        return readObject(join(folder, fileName), type);
     }
 
     public boolean contains(String fileName) {
-        return Utils.join(folder, fileName).exists();
+        return join(folder, fileName).exists();
+    }
+
+    /** Deletes the file from the folder */
+    public void clear(String filename) {
+        File file = join(folder, filename);
+        if (file.exists() && !file.isDirectory()) {
+            file.delete();
+        }
     }
 
     @Override

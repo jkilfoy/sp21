@@ -59,13 +59,22 @@ public class Main {
                 case "init":
                     throw new GitletException("A Gitlet version-control system already exists in the current directory.");
                 case "add":
-                    // TODO: handle the `add [filename]` command
+                    verifyNumArguments(1, args.length - 1);
+                    StagingArea.add(args[1]);
                     break;
-                // TODO: FILL THE REST IN
+                case "remove":
+                    break;
+
             }
         } catch (GitletException e) {
             System.out.println(e.getMessage());
             return;
+        }
+    }
+
+    public static void verifyNumArguments(int expected, int actual) {
+        if (actual < expected) {
+            throw new GitletException("Incorrect operands.");
         }
     }
 
