@@ -5,6 +5,11 @@ import java.io.Serializable;
 import java.util.Iterator;
 import java.util.function.Function;
 
+/**
+ * Utility class for easily reading, persisting and looping over serializable objects
+ * within a folder that contains them.
+ * @param <T> The type of object serialized in the folder
+ */
 public class FolderManager<T extends Serializable> implements Iterable<T> {
 
     final File folder;

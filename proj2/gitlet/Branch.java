@@ -31,6 +31,10 @@ public class Branch implements Serializable {
         return commitId;
     }
 
+    public Commit getCommit() {
+        return Main.COMMITS.read(commitId);
+    }
+
     public void setCommitId(String commitId) {
         this.commitId = commitId;
     }
