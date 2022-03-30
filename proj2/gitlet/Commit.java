@@ -1,7 +1,11 @@
 package gitlet;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TreeMap;
 
 /**
@@ -14,7 +18,10 @@ import java.util.TreeMap;
  *
  *  @author Jordan Kilfoy
  */
+// TODO : merge commit
 public class Commit implements Digestable, Serializable {
+
+    private static final SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy Z", Locale.US);
 
     /** The message of this Commit. */
     private final String message;
@@ -33,6 +40,14 @@ public class Commit implements Digestable, Serializable {
         this.timestamp = timestamp;
         this.parentId = parentId;
         this.blobs = blobs;
+    }
+
+    public String toString() {
+        ZonedDateTime zdt = ZonedDateTime.ofInstant(timestamp.toInstant(), ZoneId.systemDefault());
+        return "commit " + digest() + System.lineSeparator() +
+                "Date: " + formatter.format(timestamp) + System.lineSeparator() +
+                message + System.lineSeparator() +
+                System.lineSeparator();
     }
 
     // Getters

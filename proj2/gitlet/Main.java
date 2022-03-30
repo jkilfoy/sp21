@@ -70,6 +70,12 @@ public class Main {
                     verifyNumArguments(1, args.length - 1);
                     Repository.commit(args[1]);
                     break;
+                case "log":
+                    Repository.log();
+                    break;
+                case "global-log":
+                    Repository.globalLog();
+                    break;
                 default:
                     throw new GitletException("No command with that name exists.");
             }

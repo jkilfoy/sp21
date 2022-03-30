@@ -2,6 +2,7 @@ package gitlet;
 
 import java.io.File;
 import java.util.Date;
+import java.util.StringJoiner;
 import java.util.TreeMap;
 
 import static gitlet.Utils.*;
@@ -93,7 +94,7 @@ public class Repository {
         }
 
         // Create and persist the new commit
-        Commit newCommit = new Commit(message, new Date(), parentCommit.digest(), blobs);
+        Commit newCommit = new Commit(message, new Date(), getHead().getCommitId(), blobs);
         COMMITS.persist(newCommit);
 
         // Update the commit of the HEAD branch
@@ -102,5 +103,24 @@ public class Repository {
 
         // Clear the staging area
         StagingArea.clear();
+    }
+
+    /** Prints a log of all commits in this branch, starting from HEAD and ending at the init commit */
+    public static void log() {
+        StringJoiner sj = new StringJoiner("===" + System.lineSeparator(), "===" + System.lineSeparator(), "");
+        Commit commit = getHead().getCommit();
+        while (commit != null) {
+            sj.add(commit.toString());
+            commit = COMMITS.read(commit.getParentId());
+        }
+        System.out.print(sj);
+    }
+
+    public static void globalLog() {
+        StringJoiner sj = new StringJoiner("===" + System.lineSeparator(), "===" + System.lineSeparator(), "");
+        for (Commit commit : COMMITS) {
+            sj.add(commit.toString());
+        }
+        System.out.print(sj);
     }
 }
