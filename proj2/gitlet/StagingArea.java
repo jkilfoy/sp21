@@ -88,6 +88,13 @@ public class StagingArea {
     /** Removes a file from the staging area, and from the CWD provided
      * it is tracked by the HEAD commit */
     public static void remove(String filename) throws GitletException {
+
+        // If there's no reason to remove file, throw error message
+        if (!Repository.getHead().getCommit().getBlobs().containsKey(filename)
+        &&  !getAdded().containsKey(filename)) {
+            throw new GitletException("No reason to remove the file.");
+        }
+
         // Remove the file from the staging area
         if (getAdded().containsKey(filename)) {
             STAGED_BLOBS.clear(getAdded().get(filename));

@@ -58,7 +58,7 @@ public class Repository {
         StagingArea.init();
 
         // Create the initial commit
-        Commit initCommit = new Commit(INITIAL_COMMIT_MSG, new Date(0), null, null);
+        Commit initCommit = new Commit(INITIAL_COMMIT_MSG, new Date(0), "", new TreeMap<>());
         COMMITS.persist(initCommit);
 
         // Create the master branch and set it as head
