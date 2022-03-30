@@ -27,9 +27,19 @@ public interface Digestable {
             try {
                 field.setAccessible(true);
                 if (field.getType().equals(byte[].class)) {
-                    stringsToHash.add(new String((byte[]) field.get(this), StandardCharsets.UTF_8));
+                    byte[] value = (byte[]) field.get(this);
+                    if (value == null) {
+                        stringsToHash.add("");
+                    } else {
+                        stringsToHash.add(new String(value, StandardCharsets.UTF_8));
+                    }
                 } else {
-                    stringsToHash.add(field.get(this).toString());
+                    Object value = field.get(this);
+                    if (value == null) {
+                        stringsToHash.add("");
+                    } else {
+                        stringsToHash.add(value.toString());
+                    }
                 }
             } catch (IllegalAccessException e) {
                 // ignore a field that cannot be accessed
