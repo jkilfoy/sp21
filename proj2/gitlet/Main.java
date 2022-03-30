@@ -62,7 +62,7 @@ public class Main {
                     verifyNumArguments(1, args.length - 1);
                     StagingArea.add(args[1]);
                     break;
-                case "remove":
+                case "rm":
                     verifyNumArguments(1, args.length - 1);
                     StagingArea.remove(args[1]);
                     break;
@@ -70,7 +70,8 @@ public class Main {
                     verifyNumArguments(1, args.length - 1);
                     Repository.commit(args[1]);
                     break;
-
+                default:
+                    throw new GitletException("No command with that name exists.");
             }
         } catch (GitletException e) {
             System.out.println(e.getMessage());
