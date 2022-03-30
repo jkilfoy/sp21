@@ -76,6 +76,22 @@ public class Main {
                 case "global-log":
                     Repository.globalLog();
                     break;
+                case "find":
+                    verifyNumArguments(1, args.length - 1);
+                    Repository.find(args[1]);
+                    break;
+                case "status":
+                    Repository.status();
+                    break;
+                case "checkout":
+                    if (args.length == 2) {
+                        Repository.checkoutBranch(args[1]);
+                    } else if (args.length == 3) {
+                        Repository.checkoutFile(args[2]);
+                    } else if (args.length == 4) {
+                        Repository.checkoutFileFromCommit(args[3], args[1]);
+                    }
+                    break;
                 default:
                     throw new GitletException("No command with that name exists.");
             }

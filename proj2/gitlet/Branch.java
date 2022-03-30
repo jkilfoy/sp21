@@ -10,6 +10,8 @@ import java.io.Serializable;
  */
 public class Branch implements Serializable {
 
+    final static long serialVersionUID = -9054031183241974158L;
+
     /** The name of the branch */
     private final String name;
 
@@ -19,6 +21,14 @@ public class Branch implements Serializable {
     public Branch(String name, String commitId) {
         this.name = name;
         this.commitId = commitId;
+    }
+
+    public boolean equals(Object o) {
+        if (!(o instanceof Branch)) {
+            return false;
+        }
+        Branch other = (Branch) o;
+        return other.getName().equals(name) && other.getCommitId().equals(commitId);
     }
 
     //Getters and Setters

@@ -73,10 +73,13 @@ public class StagingArea {
             STAGED_BLOBS.clear(getAdded().get(filename));
         }
 
-        // Persist the blob in the staging area
-        Blob staged_blob = new Blob(readContents(file), filename);
-        STAGED_BLOBS.persist(staged_blob);
-        getAdded().put(filename, staged_blob.digest());
+        // Stage it if the file is different from the currently tracked version
+        Blob blobToStage = new Blob(readContents(file), filename);
+        if (!TRACKED_BLOBS.contains(blobToStage.digest())) {
+            // Persist the blob in the staging area
+            STAGED_BLOBS.persist(blobToStage);
+            getAdded().put(filename, blobToStage.digest());
+        }
 
         // If the file was staged for removal, un-stage it for removal
         getRemoved().remove(filename);
