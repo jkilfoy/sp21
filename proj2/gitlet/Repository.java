@@ -19,13 +19,13 @@ public class Repository {
     public static final File CWD = new File(System.getProperty("user.dir"));
     /** The .gitlet directory. */
     public static final File GITLET_DIR = join(CWD, ".gitlet");
-    /** The file name containing the head commit */
+    /** The file containing the head commit */
     public static final File HEAD_FILE = join(GITLET_DIR, "HEAD");
 
     /** The message of the initial commit */
     public static final String INITIAL_COMMIT_MSG = "initial commit";
     /** The name of the master branch */
-    public static final String MASTER_BRANCH = "master";
+    public static final String MASTER_BRANCH_NAME = "master";
 
     /** The head commit of the repository. Lazily loaded in its getter. */
     private static Branch head;
@@ -63,9 +63,9 @@ public class Repository {
         COMMITS.persist(initCommit);
 
         // Create the master branch and set it as head
-        Branch master = new Branch(MASTER_BRANCH, initCommit.digest());
+        Branch master = new Branch(MASTER_BRANCH_NAME, initCommit.digest());
         BRANCHES.persist(master);
-        setHead(MASTER_BRANCH);
+        setHead(MASTER_BRANCH_NAME);
     }
 
 
@@ -83,18 +83,19 @@ public class Repository {
             TRACKED_BLOBS.persist(blob);
         }
 
-        // Prepare the new commit's blobs treemap
+        // Prepare the new commit, containing all blobs tracked by the current head
+        // plus any additions / removals from the staging area
         Commit parentCommit = getHead().getCommit();
-        TreeMap<String, String> blobs = parentCommit.getBlobs();
+        TreeMap<String, String> blobsToTrack = parentCommit.getBlobs();
         for (String removedFilename : StagingArea.getRemoved()) {
-            blobs.remove(removedFilename);
+            blobsToTrack.remove(removedFilename);
         }
         for (String addedFilename : StagingArea.getAdded().navigableKeySet()) {
-            blobs.put(addedFilename, StagingArea.getAdded().get(addedFilename));
+            blobsToTrack.put(addedFilename, StagingArea.getAdded().get(addedFilename));
         }
 
         // Create and persist the new commit
-        Commit newCommit = new Commit(message, new Date(), getHead().getCommitId(), blobs);
+        Commit newCommit = new Commit(message, new Date(), getHead().getCommitId(), blobsToTrack);
         COMMITS.persist(newCommit);
 
         // Update the commit of the HEAD branch
@@ -116,6 +117,7 @@ public class Repository {
         System.out.print(sj);
     }
 
+    /** Prints a log of all commits in the repository */
     public static void globalLog() {
         StringJoiner sj = new StringJoiner("===" + System.lineSeparator(), "===" + System.lineSeparator(), "");
         for (Commit commit : COMMITS) {
@@ -199,5 +201,25 @@ public class Repository {
         }
         Blob fromCommit = TRACKED_BLOBS.read(commit.getBlobs().get(fileName));
         writeContents(join(CWD, fileName), fromCommit.getContents());
+    }
+
+    /** Creates a branch with the given name */
+    public static void createBranch(String branchName) {
+        if (BRANCHES.contains(branchName)) {
+            throw new GitletException("A branch with that name already exists.");
+        }
+        Branch newBranch = new Branch(branchName, getHead().getCommitId());
+        BRANCHES.persist(newBranch);
+    }
+
+    /** Removes the branch with the given name if it exists and is not HEAD */
+    public static void removeBranch(String branchName) {
+        if (getHead().getName().equals(branchName)) {
+            throw new GitletException("Cannot remove the current branch.");
+        }
+        if (!BRANCHES.contains(branchName)) {
+            throw new GitletException("A branch with that name does not exist.");
+        }
+        BRANCHES.clear(branchName);
     }
 }

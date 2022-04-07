@@ -92,6 +92,18 @@ public class Main {
                         Repository.checkoutFileFromCommit(args[3], args[1]);
                     }
                     break;
+                case "branch":
+                    verifyNumArguments(1, args.length - 1);
+                    Repository.createBranch(args[1]);
+                    break;
+                case "rm-branch":
+                    verifyNumArguments(1, args.length - 1);
+                    Repository.removeBranch(args[1]);
+                    break;
+                case "reset":
+                    verifyNumArguments(1, args.length - 1);
+                    //Repository.reset(args[1]);
+                    break;
                 default:
                     throw new GitletException("No command with that name exists.");
             }

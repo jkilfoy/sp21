@@ -43,38 +43,40 @@
 
 #### Add, Remove and Commit
 
-1. Write StagingArea.add method
-2. Write StagingArea.remove method
-3. Write StagingArea.clear method
-4. Write Repository.commit method
+1. XXX Write StagingArea.add method
+2. XXX Write StagingArea.remove method
+3. XXX Write StagingArea.clear method
+4. XXX Write Repository.commit method
 5. In `Repository.main` method, implement the main switch block and add these cases:
-   1. add - calls `StagingArea.add`
-   2. remove - calls `StagingArea.remove`
-   3. commit - calls `Repository.commit`
-6. Be sure to try / throw / catch and print appropriate error messages
+   1. XXX add - calls `StagingArea.add`
+   2. XXX remove - calls `StagingArea.remove`
+   3. XXX commit - calls `Repository.commit`
+6. XXX Be sure to try / throw / catch and print appropriate error messages
 7. TEST
 
 #### Log
 
-1. Write `Repository.log` method
-2. Write `Repository.globalLog` method
-3. Write `Repository.status` method
-4. Link up these methods in appropriate cases of `Main.main` switch block
-5. Be sure to try/ throw / catch and print appropriate error messages
+1. XXX Write `Repository.log` method
+   1. Todo: Consider merge commits
+2. XXX Write `Repository.globalLog` method
+3. XXX Write `Repository.status` method
+   1. Todo: consider EC
+4. XXX Link up these methods in appropriate cases of `Main.main` switch block
+5. XXX Be sure to try/ throw / catch and print appropriate error messages
 6. TEST
 
 #### Branch
 
-1. Write `Repository.branch` method
-2. Link up method in `Main.main`
-3. Be sure to try/throw/catch errors
+1. XXX Write `Repository.branch` method
+2. XXX Link up method in `Main.main`
+3. XXX Be sure to try/throw/catch errors
 4. TEST
 
 #### Checkout and Reset
 
-1. Write all three `Repository.checkout` methods
-2. Link up in `Main.main`
-3. Be sure to try/throw/catch errors
+1. XXX Write all three `Repository.checkout` methods
+2. XXX Link up in `Main.main`
+3. XXX Be sure to try/throw/catch errors
 4. TEST
 5. Write `Repository.reset` method, which mostly just called checkout and setBranch
 6. Link up in `Main.main`
