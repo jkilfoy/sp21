@@ -2,6 +2,7 @@ package gitlet;
 
 import java.io.File;
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.function.Function;
 import static gitlet.Utils.*;
@@ -16,6 +17,7 @@ public class FolderManager<T extends Serializable> implements Iterable<T> {
     final File folder;
     final Class<T> type;
     final Function<T, String> getFileName;
+    final HashMap<String, T> cache;
 
     public FolderManager(File folder, Class<T> type) {
         this(folder, type, Object::toString);
@@ -25,6 +27,7 @@ public class FolderManager<T extends Serializable> implements Iterable<T> {
         this.folder = folder;
         this.type = type;
         this.getFileName = getFileName;
+        this.cache = new HashMap<>();
     }
 
     public File getFolder() {
@@ -42,7 +45,10 @@ public class FolderManager<T extends Serializable> implements Iterable<T> {
 
     public T read(String fileName) {
         if ("".equals(fileName) || !contains(fileName)) return null;
-        return readObject(join(folder, fileName), type);
+        if (cache.containsKey(fileName)) return cache.get(fileName);
+        T obj = readObject(join(folder, fileName), type);
+        cache.put(fileName, obj);
+        return obj;
     }
 
     public boolean contains(String fileName) {
@@ -54,6 +60,7 @@ public class FolderManager<T extends Serializable> implements Iterable<T> {
         File file = join(folder, filename);
         if (file.exists() && !file.isDirectory()) {
             file.delete();
+            cache.remove(filename);
         }
     }
 
