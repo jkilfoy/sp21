@@ -44,8 +44,8 @@ public class FolderManager<T extends Serializable> implements Iterable<T> {
     }
 
     public T read(String fileName) {
-        if ("".equals(fileName) || !contains(fileName)) return null;
         if (cache.containsKey(fileName)) return cache.get(fileName);
+        if ("".equals(fileName) || !contains(fileName)) return null;
         T obj = readObject(join(folder, fileName), type);
         cache.put(fileName, obj);
         return obj;
