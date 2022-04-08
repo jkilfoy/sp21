@@ -153,6 +153,8 @@ public class Repository {
         System.out.println();
     }
 
+    /** Checks out the commit in the branch specified if it exists,
+     * then sets head to that branch and clears the staging area */
     public static void checkoutBranch(String branchName) {
         Branch branch = BRANCHES.read(branchName);
         if (branch == null) {
@@ -162,7 +164,47 @@ public class Repository {
             throw new GitletException("No need to checkout the current branch.");
         }
 
-        // make sure there is no untracked file in the way
+        // checkout the commit of the given branch
+        checkoutCommit(branch.getCommitId());
+
+        // set head
+        setHead(branchName);
+
+        // clear staging area
+        StagingArea.clear();
+    }
+
+    /** Overwrites or creates the fileName provided into the CWD with the contents
+     * of the file as stored in the provided commitId
+     * @param fileName The file to checkout
+     * @param commitId The commitId of the commit to find the blob in
+     */
+    public static void checkoutFileFromCommit(String fileName, String commitId) {
+        Commit commit = COMMITS.read(commitId);
+        if (commit == null) {
+            throw new GitletException("No commit with that id exists.");
+        }
+        if (!commit.getBlobs().containsKey(fileName)) {
+            throw new GitletException("File does not exist in that commit.");
+        }
+        Blob fromCommit = TRACKED_BLOBS.read(commit.getBlobs().get(fileName));
+        writeContents(join(CWD, fileName), fromCommit.getContents());
+    }
+
+    /** Checks out a file from the current head */
+    public static void checkoutFileFromHead(String fileName) {
+        checkoutFileFromCommit(fileName, getHead().getCommitId());
+    }
+
+    /** Overwrites the CWD to the state of the provided commit; fails if
+     * a file untracked by the head branch is in the way */
+    public static void checkoutCommit(String commitId) {
+        Commit commitToCheckout = COMMITS.read(commitId);
+        if (commitToCheckout == null) {
+            throw new GitletException("No commit with that id exists.");
+        }
+
+        // make sure there is no files untracked by head in the way
         Commit headCommit = getHead().getCommit();
         for (String filename : plainFilenamesIn(CWD)) {
             if (!headCommit.getBlobs().containsKey(filename)) {
@@ -176,31 +218,9 @@ public class Repository {
         }
 
         // check out all files from the commit
-        for (String filename : branch.getCommit().getBlobs().navigableKeySet()) {
-            checkoutFileFromCommit(filename, branch.getCommitId());
+        for (String filename : COMMITS.read(commitId).getBlobs().navigableKeySet()) {
+            checkoutFileFromCommit(filename, commitId);
         }
-
-        // set head
-        setHead(branchName);
-
-        // clear staging area
-        StagingArea.clear();
-    }
-
-    public static void checkoutFile(String fileName) {
-        checkoutFileFromCommit(fileName, getHead().getCommitId());
-    }
-
-    public static void checkoutFileFromCommit(String fileName, String commitId) {
-        Commit commit = COMMITS.read(commitId);
-        if (commit == null) {
-            throw new GitletException("No commit with that id exists.");
-        }
-        if (!commit.getBlobs().containsKey(fileName)) {
-            throw new GitletException("File does not exist in that commit.");
-        }
-        Blob fromCommit = TRACKED_BLOBS.read(commit.getBlobs().get(fileName));
-        writeContents(join(CWD, fileName), fromCommit.getContents());
     }
 
     /** Creates a branch with the given name */
@@ -221,5 +241,12 @@ public class Repository {
             throw new GitletException("A branch with that name does not exist.");
         }
         BRANCHES.clear(branchName);
+    }
+
+    /** Resets the commit of the head branch to the commit specified; and checks out that commit */
+    public static void reset(String commitId) {
+        checkoutCommit(commitId);
+        getHead().setCommitId(commitId);
+        BRANCHES.persist(getHead());
     }
 }

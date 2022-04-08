@@ -1,7 +1,6 @@
 package gitlet;
 
 import java.io.File;
-import java.util.zip.GZIPOutputStream;
 
 /**
  * Driver class for Gitlet, a subset of the Git version-control system.
@@ -19,10 +18,10 @@ public class Main {
     public static final File STAGE_DIR = Utils.join(GITLET_DIR, "stage");
 
     /** FolderManagers for managing serialized objects */
-    public static final FolderManager<Commit> COMMITS;
-    public static final FolderManager<Blob> TRACKED_BLOBS;
-    public static final FolderManager<Branch> BRANCHES;
-    public static final FolderManager<Blob> STAGED_BLOBS;
+    public static  FolderManager<Commit> COMMITS;
+    public static  FolderManager<Blob> TRACKED_BLOBS;
+    public static  FolderManager<Branch> BRANCHES;
+    public static  FolderManager<Blob> STAGED_BLOBS;
 
     static {
         COMMITS = new FolderManager<>(Utils.join(GITLET_DIR, "commits"), Commit.class, Commit::digest);
@@ -87,7 +86,7 @@ public class Main {
                     if (args.length == 2) {
                         Repository.checkoutBranch(args[1]);
                     } else if (args.length == 3) {
-                        Repository.checkoutFile(args[2]);
+                        Repository.checkoutFileFromHead(args[2]);
                     } else if (args.length == 4) {
                         Repository.checkoutFileFromCommit(args[3], args[1]);
                     }
@@ -102,7 +101,7 @@ public class Main {
                     break;
                 case "reset":
                     verifyNumArguments(1, args.length - 1);
-                    //Repository.reset(args[1]);
+                    Repository.reset(args[1]);
                     break;
                 default:
                     throw new GitletException("No command with that name exists.");
