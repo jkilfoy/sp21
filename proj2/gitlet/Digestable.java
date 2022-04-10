@@ -2,14 +2,11 @@ package gitlet;
 
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Interface for classes that can be digested into SHA-1 hash.
- * All fields are used in the digestion in their order of declaration,
+ * All fields are used in the digestion in lexicographic order,
  * but only some types are reliably supported.
  * Unreliable field types use their toString method for digest.
  */

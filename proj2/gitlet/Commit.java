@@ -31,6 +31,7 @@ public class Commit implements Digestable, Serializable {
 
     /** The SHA-1 digest of the parent commit. */
     private final String parentId;
+    private final String secondParentId;
 
     /** Maps the name of each file in the commit to the corresponding blob id */
     private final TreeMap<String, String> blobs;
@@ -39,12 +40,26 @@ public class Commit implements Digestable, Serializable {
         this.message = message;
         this.timestamp = timestamp;
         this.parentId = parentId;
+        this.secondParentId = "";
+        this.blobs = blobs;
+    }
+
+    public Commit(String message, Date timestamp, String parentId, String secondParentId,
+                  TreeMap<String, String> blobs) {
+        this.message = message;
+        this.timestamp = timestamp;
+        this.parentId = parentId;
+        this.secondParentId = secondParentId;
         this.blobs = blobs;
     }
 
     public String toString() {
         ZonedDateTime zdt = ZonedDateTime.ofInstant(timestamp.toInstant(), ZoneId.systemDefault());
         return "commit " + digest() + System.lineSeparator() +
+                (secondParentId != null && !"".equals(secondParentId) ?
+                        "Merge:" + shorten(parentId) + " " + shorten(secondParentId) + System.lineSeparator()
+                        : ""
+                ) +
                 "Date: " + formatter.format(timestamp) + System.lineSeparator() +
                 message + System.lineSeparator() +
                 System.lineSeparator();
@@ -64,7 +79,16 @@ public class Commit implements Digestable, Serializable {
         return parentId;
     }
 
+    public String getSecondParentId() {
+        return secondParentId;
+    }
+
     public TreeMap<String, String> getBlobs() {
         return blobs;
+    }
+
+    /** Returns the first 7 characters of the input string */
+    public static String shorten(String input) {
+        return input.length() > 7 ? input.substring(0, 7) : input;
     }
 }
