@@ -1,9 +1,7 @@
 package gitlet;
 
 import java.io.File;
-import java.util.Date;
-import java.util.StringJoiner;
-import java.util.TreeMap;
+import java.util.*;
 
 import static gitlet.Utils.*;
 import static gitlet.Main.*;
@@ -27,9 +25,10 @@ public class Repository {
     /** The name of the master branch */
     public static final String MASTER_BRANCH_NAME = "master";
 
-    /** The head commit of the repository. Lazily loaded in its getter. */
+    /** The head branch of the repository */
     private static Branch head;
 
+    /** Getter for the head branch; lazily loaded */
     public static Branch getHead() {
         if (head == null) {
             String headBranchName = readContentsAsString(HEAD_FILE);
@@ -38,15 +37,14 @@ public class Repository {
         return head;
     }
 
+    /** Setter for the head barnch; persists head when changed */
     public static void setHead(String branchName) {
         assert BRANCHES.contains(branchName) : "Tried to set HEAD to a branch that does not exist";
         writeContents(HEAD_FILE, branchName);
         head = BRANCHES.read(branchName);
     }
 
-    /**
-     * Initializes a gitlet repository.
-     */
+    /** Initializes a gitlet repository. */
     public static void init() {
         // Create all necessary folders
         assert !GITLET_DIR.exists() : "Tried to initialize a repository that already exists";
@@ -204,13 +202,7 @@ public class Repository {
             throw new GitletException("No commit with that id exists.");
         }
 
-        // make sure there is no files untracked by head in the way
-        Commit headCommit = getHead().getCommit();
-        for (String filename : plainFilenamesIn(CWD)) {
-            if (!headCommit.getBlobs().containsKey(filename)) {
-                throw new GitletException("There is an untracked file in the way; delete it, or add and commit it first.");
-            }
-        }
+        failIfUntrackedFiles();
 
         // delete all current files
         for (String filename : plainFilenamesIn(CWD)) {
@@ -248,5 +240,45 @@ public class Repository {
         checkoutCommit(commitId);
         getHead().setCommitId(commitId);
         BRANCHES.persist(getHead());
+    }
+
+    /** Throws an exception if it is not safe to checkout/reset/merge */
+    public static void failIfUntrackedFiles() {
+        Commit headCommit = getHead().getCommit();
+        for (String filename : plainFilenamesIn(CWD)) {
+            if (!headCommit.getBlobs().containsKey(filename)) {
+                throw new GitletException("There is an untracked file in the way; delete it, or add and commit it first.");
+            }
+        }
+    }
+
+    public static void merge(String givenBranchName) {
+        if (!StagingArea.isEmpty()) {
+            throw new GitletException("You have uncommitted changes.");
+        }
+
+        Branch givenBranch = BRANCHES.read(givenBranchName);
+        if (givenBranch == null) {
+            throw new GitletException("A branch with that name does not exist.");
+        }
+        if (givenBranch.equals(getHead())) {
+            throw new GitletException("Cannot merge a branch with itself.");
+        }
+
+        failIfUntrackedFiles();
+
+        // Determine latest common ancestor
+        Commit splitPoint = latestCommonAncestor(getHead().getCommit(), givenBranch.getCommit());
+
+
+    }
+
+    /** Determines the latest common ancestor of two commits by:
+     * 1 - finds all common ancestors by taking the intersection of each commit's common ancestors
+     * 2 - returning the commit with the latest date out of this intersection */
+    public static Commit latestCommonAncestor(Commit commit1, Commit commit2) {
+        Set<Commit> commonAncestors = commit1.getAllAncestors();
+        commonAncestors.retainAll(commit2.getAllAncestors());
+        return commonAncestors.stream().max(Comparator.comparing(Commit::getTimestamp)).get();
     }
 }

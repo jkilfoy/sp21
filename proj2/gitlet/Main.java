@@ -103,6 +103,10 @@ public class Main {
                     verifyNumArguments(1, args.length - 1);
                     Repository.reset(args[1]);
                     break;
+                case "merge":
+                    verifyNumArguments(1, args.length - 1);
+                    Repository.merge(args[1]);
+                    break;
                 default:
                     throw new GitletException("No command with that name exists.");
             }

@@ -4,9 +4,9 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Date;
-import java.util.Locale;
-import java.util.TreeMap;
+import java.util.*;
+
+import static gitlet.Main.COMMITS;
 
 /**
  *  Represents a gitlet commit object.
@@ -49,8 +49,37 @@ public class Commit implements Digestable, Serializable {
         this.message = message;
         this.timestamp = timestamp;
         this.parentId = parentId;
-        this.secondParentId = secondParentId;
+        this.secondParentId = secondParentId == null ? "" : secondParentId;
         this.blobs = blobs;
+    }
+
+    /** Returns a set of all ancestors of this commit, including itself */
+    public Set<Commit> getAllAncestors() {
+        Set<Commit> ancestors = new HashSet<Commit>();
+        List<Commit> trails = new LinkedList<>();
+        trails.add(this);
+        while (!trails.isEmpty()) {
+            // For each trail
+            ListIterator<Commit> iter = trails.listIterator();
+            while (iter.hasNext()) {
+                Commit trailHead = iter.next();
+                if (!ancestors.contains(trailHead)) {
+                    // add the commit to ancestors, then add each parent to trails
+                    ancestors.add(trailHead);
+                    Commit firstParent = COMMITS.read(trailHead.getParentId());
+                    if (firstParent != null) {
+                        trails.add(firstParent);
+                    }
+                    Commit secondParent = COMMITS.read(trailHead.getSecondParentId());
+                    if (secondParent != null) {
+                        trails.add(secondParent);
+                    }
+                }
+                // Remove the commit from trails
+                iter.remove();
+            }
+        }
+        return ancestors;
     }
 
     public String toString() {
