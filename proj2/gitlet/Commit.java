@@ -116,6 +116,17 @@ public class Commit implements Digestable, Serializable {
         return blobs;
     }
 
+    @Override
+    public String digest() {
+        List<String> stringsToHash = new ArrayList<>();
+        stringsToHash.add(message);
+        stringsToHash.add(timestamp.toString());
+        stringsToHash.add(parentId);
+        stringsToHash.add(secondParentId);
+        stringsToHash.add(blobs.toString());
+        return Utils.sha1(stringsToHash.toArray(new String[0]));
+    }
+
     /** Returns the first 7 characters of the input string */
     public static String shorten(String input) {
         return input.length() > 7 ? input.substring(0, 7) : input;

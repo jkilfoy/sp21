@@ -1,6 +1,9 @@
 package gitlet;
 
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 import static gitlet.Main.CWD;
 
@@ -42,5 +45,13 @@ public class Blob implements Digestable, Serializable {
 
     public String getName() {
         return name;
+    }
+
+    @Override
+    public String digest() {
+        List<String> stringsToHash = new ArrayList<>();
+        stringsToHash.add(new String(contents, StandardCharsets.UTF_8));
+        stringsToHash.add(name);
+        return Utils.sha1(stringsToHash.toArray(new String[0]));
     }
 }
