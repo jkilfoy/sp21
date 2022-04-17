@@ -129,6 +129,8 @@ public class Main {
                     return commit.digest();
                 }
             }
+        } else {
+            return input;
         }
         throw new GitletException("No commit with that id exists.");
     }
