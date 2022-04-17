@@ -148,6 +148,8 @@ public class Repository {
         for (String filename : StagingArea.getRemoved()) {
             System.out.println(filename);
         }
+        System.out.println(System.lineSeparator() + "=== Modifications Not Staged For Commit ===");
+        System.out.println(System.lineSeparator() + "=== Untracked Files ===");
         System.out.println();
     }
 
@@ -269,6 +271,20 @@ public class Repository {
 
         // Determine latest common ancestor
         Commit splitPoint = latestCommonAncestor(getHead().getCommit(), givenBranch.getCommit());
+
+//        // Nothing to do if given branch is an ancestor of current branch
+//        if (givenBranch.getCommit().equals(splitPoint)) {
+//            throw new GitletException("Given branch is an ancestor of the current branch.");
+//        }
+//
+//        // Fastforward if current branch is an ancestor of the given branch
+//        if (head.getCommit().equals(splitPoint)) {
+//            checkoutBranch(givenBranchName);
+//            throw new GitletException("Current branch fast-forwarded.");
+//        }
+//
+//
+//
 
 
     }
