@@ -88,17 +88,7 @@ public class Main {
                     } else if (args.length == 3 && args[1].equals("--")) {
                         Repository.checkoutFileFromHead(args[2]);
                     } else if (args.length == 4 && args[2].equals("--")) {
-                        String commitId = args[1];
-                        // if a shortened commit id is used,
-                        // find the first commitId that starts with the prefix
-                        if (commitId.length() < 40) {
-                            for (Commit commit : COMMITS) {
-                                if (commit.digest().startsWith(commitId)) {
-                                    commitId = commit.digest();
-                                    break;
-                                }
-                            }
-                        }
+                        String commitId = determineFullCommitId(args[1]);
                         Repository.checkoutFileFromCommit(args[3], commitId);
                     } else {
                         throw new GitletException("Incorrect operands.");
@@ -114,7 +104,8 @@ public class Main {
                     break;
                 case "reset":
                     verifyNumArguments(1, args.length - 1);
-                    Repository.reset(args[1]);
+                    String commitId = determineFullCommitId(args[1]);
+                    Repository.reset(commitId);
                     break;
                 case "merge":
                     verifyNumArguments(1, args.length - 1);
@@ -127,6 +118,19 @@ public class Main {
             System.out.println(e.getMessage());
             return;
         }
+    }
+
+    // if a shortened commit id is used,
+    // find the first commitId that starts with the input prefix
+    private static String determineFullCommitId(String input) {
+        if (input.length() < 40) {
+            for (Commit commit : COMMITS) {
+                if (commit.digest().startsWith(input)) {
+                    return commit.digest();
+                }
+            }
+        }
+        throw new GitletException("No commit with that id exists.");
     }
 
     public static void verifyNumArguments(int expected, int actual) {
