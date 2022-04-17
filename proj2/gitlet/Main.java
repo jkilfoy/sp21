@@ -85,10 +85,23 @@ public class Main {
                 case "checkout":
                     if (args.length == 2) {
                         Repository.checkoutBranch(args[1]);
-                    } else if (args.length == 3) {
+                    } else if (args.length == 3 && args[1].equals("--")) {
                         Repository.checkoutFileFromHead(args[2]);
-                    } else if (args.length == 4) {
-                        Repository.checkoutFileFromCommit(args[3], args[1]);
+                    } else if (args.length == 4 && args[2].equals("--")) {
+                        String commitId = args[1];
+                        // if a shortened commit id is used,
+                        // find the first commitId that starts with the prefix
+                        if (commitId.length() < 40) {
+                            for (Commit commit : COMMITS) {
+                                if (commit.digest().startsWith(commitId)) {
+                                    commitId = commit.digest();
+                                    break;
+                                }
+                            }
+                        }
+                        Repository.checkoutFileFromCommit(args[3], commitId);
+                    } else {
+                        throw new GitletException("Incorrect operands.");
                     }
                     break;
                 case "branch":
