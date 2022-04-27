@@ -127,10 +127,15 @@ public class Repository {
 
     /** Prints the commitIds of all commits with a matching commit message */
     public static void find(String message) {
+        boolean found = false;
         for (Commit commit : COMMITS) {
             if (commit.getMessage().equals(message)) {
                 System.out.println(commit.digest());
+                found = true;
             }
+        }
+        if (!found) {
+            throw new GitletException("Found no commit with that message.");
         }
     }
 
