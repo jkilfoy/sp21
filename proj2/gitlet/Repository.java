@@ -248,6 +248,7 @@ public class Repository {
         checkoutCommit(commitId);
         getHead().setCommitId(commitId);
         BRANCHES.persist(getHead());
+        StagingArea.clear();
     }
 
     /** Throws an exception if any of the provided filenames is untracked in the current branch  */
