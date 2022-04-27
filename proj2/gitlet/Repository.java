@@ -262,7 +262,7 @@ public class Repository {
         Commit headCommit = getHead().getCommit();
         return Objects.requireNonNull(plainFilenamesIn(CWD))
                 .stream()
-                .filter(headCommit.getBlobs()::containsKey)
+                .filter(s -> !headCommit.getBlobs().containsKey(s)) // filter our files tracked by head
                 .collect(Collectors.toList());
     }
 
