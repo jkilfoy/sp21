@@ -2,6 +2,7 @@ package gitlet;
 
 import java.io.File;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static gitlet.Utils.*;
 import static gitlet.Main.*;
@@ -204,7 +205,7 @@ public class Repository {
             throw new GitletException("No commit with that id exists.");
         }
 
-        failIfUntrackedFiles();
+        failIfChangingUntrackedFile(commitToCheckout.getBlobs().navigableKeySet());
 
         // delete all current files
         for (String filename : plainFilenamesIn(CWD)) {
@@ -244,14 +245,20 @@ public class Repository {
         BRANCHES.persist(getHead());
     }
 
-    /** Throws an exception if it is not safe to checkout/reset/merge */
-    public static void failIfUntrackedFiles() {
-        Commit headCommit = getHead().getCommit();
-        for (String filename : plainFilenamesIn(CWD)) {
-            if (!headCommit.getBlobs().containsKey(filename)) {
-                throw new GitletException("There is an untracked file in the way; delete it, or add and commit it first.");
-            }
+    /** Throws an exception if any of the provided filenames is untracked in the current branch  */
+    public static void failIfChangingUntrackedFile(Set<String> changingFileNames) {
+        if (changingFileNames.stream().distinct().anyMatch(untrackedFileNames()::contains)) {
+            throw new GitletException("There is an untracked file in the way; delete it, or add and commit it first.");
         }
+    }
+
+    /** Returns a list of names of all untracked files in CWD */
+    public static List<String> untrackedFileNames() {
+        Commit headCommit = getHead().getCommit();
+        return Objects.requireNonNull(plainFilenamesIn(CWD))
+                .stream()
+                .filter(headCommit.getBlobs()::containsKey)
+                .collect(Collectors.toList());
     }
 
     public static void merge(String givenBranchName) {
@@ -267,7 +274,7 @@ public class Repository {
             throw new GitletException("Cannot merge a branch with itself.");
         }
 
-        failIfUntrackedFiles();
+        //failIfChangingUntrackedFile();
 
         // Determine latest common ancestor
         Commit splitPoint = latestCommonAncestor(getHead().getCommit(), givenBranch.getCommit());
