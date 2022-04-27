@@ -212,8 +212,8 @@ public class Repository {
 
         failIfChangingUntrackedFile(commitToCheckout.getBlobs().navigableKeySet());
 
-        // delete all current files
-        for (String filename : plainFilenamesIn(CWD)) {
+        // delete all current tracked files
+        for (String filename : getHead().getCommit().getBlobs().navigableKeySet()) {
             restrictedDelete(join(CWD, filename));
         }
 
