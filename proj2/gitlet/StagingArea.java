@@ -41,10 +41,8 @@ public class StagingArea {
 
     // Persists the added and removed objects
     private static void persist() {
-        getAdded();
-        getRemoved();
-        writeObject(ADDED_FILE, added);
-        writeObject(REMOVED_FILE, removed);
+        writeObject(ADDED_FILE, getAdded());
+        writeObject(REMOVED_FILE, getRemoved());
     }
 
     private static void resetAddedAndRemoved() {
@@ -71,11 +69,14 @@ public class StagingArea {
         // Clear the already staged version of the file if it exists
         if (getAdded().containsKey(filename)) {
             STAGED_BLOBS.clear(getAdded().get(filename));
+            getAdded().remove(filename);
         }
 
         // Stage it if the file is different from the currently tracked version
         Blob blobToStage = new Blob(readContents(file), filename);
-        if (!TRACKED_BLOBS.contains(blobToStage.digest())) {
+        Commit headCommit = Repository.getHead().getCommit();
+        if (!headCommit.getBlobs().containsKey(filename)
+         || !headCommit.getBlobs().get(filename).equals(blobToStage.digest())) {
             // Persist the blob in the staging area
             STAGED_BLOBS.persist(blobToStage);
             getAdded().put(filename, blobToStage.digest());
