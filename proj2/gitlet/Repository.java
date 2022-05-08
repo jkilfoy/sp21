@@ -371,9 +371,12 @@ public class Repository {
                 givenContents = new String(TRACKED_BLOBS.read(blobId).getContents());
             }
 
-            writeContents(join(CWD, filename), "<<<<<<< HEAD", System.lineSeparator(),
-                    currentContents, System.lineSeparator(), "=======", System.lineSeparator(),
-                    givenContents, ">>>>>>>");
+            writeContents(join(CWD, filename),
+                    "<<<<<<< HEAD", System.lineSeparator(),
+                    currentContents, System.lineSeparator(),
+                    "=======", System.lineSeparator(),
+                    givenContents, System.lineSeparator(),
+                    ">>>>>>>");
 
             StagingArea.add(filename);
         }
