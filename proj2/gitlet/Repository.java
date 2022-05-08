@@ -291,8 +291,6 @@ public class Repository {
         Commit given = givenBranch.getCommit();
         Commit splitPoint = latestCommonAncestor(current, given);
 
-//        System.out.println("Merging. Current blobs : " + current.getBlobs() + "\nGiven blobs : " + given.getBlobs());
-
         // Nothing to do if given branch is an ancestor of current branch
         if (given.equals(splitPoint)) {
             throw new GitletException("Given branch is an ancestor of the current branch.");
@@ -320,7 +318,6 @@ public class Repository {
         }
 
         // Compare changes with current commit's changes from split point to detect conflicts or identical modifications
-//        System.out.println("Changes at first : " + changes);
         Set<String> tempChanges = new HashSet<>(changes.navigableKeySet());
         for (String filename : tempChanges) {
             switch (checkModifiedStatus(filename, splitPoint, current)) {
@@ -347,9 +344,6 @@ public class Repository {
         failIfChangingUntrackedFile(conflicts);
 
         // Checkout and stage all changes
-        // todo remove:
-//        System.out.println("Changes : " + changes);
-//        System.out.println("Conflicts : " + conflicts);
         for (String filename : changes.navigableKeySet()) {
             if (changes.get(filename).equals("REMOVED")) {
                 StagingArea.remove(filename);
