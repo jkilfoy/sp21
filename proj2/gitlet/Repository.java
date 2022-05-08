@@ -373,10 +373,10 @@ public class Repository {
 
             writeContents(join(CWD, filename),
                     "<<<<<<< HEAD", System.lineSeparator(),
-                    currentContents, System.lineSeparator(),
+                    currentContents,
                     "=======", System.lineSeparator(),
-                    givenContents, System.lineSeparator(),
-                    ">>>>>>>");
+                    givenContents,
+                    ">>>>>>>", System.lineSeparator());
 
             StagingArea.add(filename);
         }
