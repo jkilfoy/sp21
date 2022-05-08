@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import static gitlet.Utils.*;
 import static gitlet.Main.*;
+import static gitlet.ModifiedStatus.*;
 
 /**
  * Represents a gitlet repository.
@@ -69,7 +70,7 @@ public class Repository {
 
 
     /** Commits all changes inside the staging area */
-    public static void commit(String message) {
+    public static void commit(String message, String secondParentId) {
         if (StagingArea.isEmpty()) {
             throw new GitletException("No changes added to the commit.");
         }
@@ -94,7 +95,12 @@ public class Repository {
         }
 
         // Create and persist the new commit
-        Commit newCommit = new Commit(message, new Date(), getHead().getCommitId(), blobsToTrack);
+        Commit newCommit;
+        if (secondParentId != null) {
+            newCommit = new Commit(message, new Date(), getHead().getCommitId(), secondParentId, blobsToTrack);
+        } else {
+            newCommit = new Commit(message, new Date(), getHead().getCommitId(), blobsToTrack);
+        }
         COMMITS.persist(newCommit);
 
         // Update the commit of the HEAD branch
@@ -280,34 +286,129 @@ public class Repository {
             throw new GitletException("Cannot merge a branch with itself.");
         }
 
-        //failIfChangingUntrackedFile();
-
         // Determine latest common ancestor
-        Commit splitPoint = latestCommonAncestor(getHead().getCommit(), givenBranch.getCommit());
+        Commit current = getHead().getCommit();
+        Commit given = givenBranch.getCommit();
+        Commit splitPoint = latestCommonAncestor(current, given);
 
-//        // Nothing to do if given branch is an ancestor of current branch
-//        if (givenBranch.getCommit().equals(splitPoint)) {
-//            throw new GitletException("Given branch is an ancestor of the current branch.");
-//        }
-//
-//        // Fastforward if current branch is an ancestor of the given branch
-//        if (head.getCommit().equals(splitPoint)) {
-//            checkoutBranch(givenBranchName);
-//            throw new GitletException("Current branch fast-forwarded.");
-//        }
-//
-//
-//
+//        System.out.println("Merging. Current blobs : " + current.getBlobs() + "\nGiven blobs : " + given.getBlobs());
 
+        // Nothing to do if given branch is an ancestor of current branch
+        if (given.equals(splitPoint)) {
+            throw new GitletException("Given branch is an ancestor of the current branch.");
+        }
 
+        // Fastforward if current branch is an ancestor of the given branch
+        if (current.equals(splitPoint)) {
+            checkoutBranch(givenBranchName);
+            throw new GitletException("Current branch fast-forwarded.");
+        }
+
+        // Determine all files that will be staged in the merge commit.
+        // This treemap maps filenames to Blob ids or the keyword "REMOVED"
+        TreeMap<String, String> changes = new TreeMap<>();
+        TreeSet<String> conflicts = new TreeSet<>();
+
+        // Loop through all files in the given commit to find changes from split point
+        for (String filename : given.getBlobs().navigableKeySet()) {
+            switch (checkModifiedStatus(filename, splitPoint, given)) {
+                case ADDED, MODIFIED -> changes.put(filename, given.getBlobs().get(filename));
+                case REMOVED -> changes.put(filename, "REMOVED");
+            }
+        }
+
+        // Compare changes with current commit's changes from split point to detect conflicts or identical modifications
+//        System.out.println("Changes at first : " + changes);
+        Set<String> tempChanges = new HashSet<>(changes.navigableKeySet());
+        for (String filename : tempChanges) {
+            switch (checkModifiedStatus(filename, splitPoint, current)) {
+                case ADDED, MODIFIED -> {
+                    // if blob ids are different, this is a conflict
+                    if (!current.getBlobs().get(filename).equals(changes.get(filename))) {
+                        conflicts.add(filename);
+                    }
+                    // either way, remove from changes
+                    changes.remove(filename);
+                }
+                case REMOVED -> {
+                    // if the change is not "REMOVED", this is a conflict
+                    if (!changes.get(filename).equals("REMOVED")) {
+                        conflicts.add(filename);
+                    }
+                    changes.remove(filename);
+                }
+            }
+        }
+
+        // Before merging, check to make sure no untracked working files will be overwritten
+        failIfChangingUntrackedFile(changes.keySet());
+        failIfChangingUntrackedFile(conflicts);
+
+        // Checkout and stage all changes
+        // todo remove:
+//        System.out.println("Changes : " + changes);
+//        System.out.println("Conflicts : " + conflicts);
+        for (String filename : changes.navigableKeySet()) {
+            if (changes.get(filename).equals("REMOVED")) {
+                StagingArea.remove(filename);
+            } else {
+                checkoutFileFromCommit(filename, givenBranch.getCommitId());
+                StagingArea.add(filename);
+            }
+        }
+
+        // Create and stage merge conflict files
+        for (String filename : conflicts) {
+            String currentContents = "";
+            if (current.getBlobs().containsKey(filename)) {
+                String blobId = current.getBlobs().get(filename);
+                currentContents = new String(TRACKED_BLOBS.read(blobId).getContents());
+            }
+
+            String givenContents = "";
+            if (given.getBlobs().containsKey(filename)) {
+                String blobId = given.getBlobs().get(filename);
+                givenContents = new String(TRACKED_BLOBS.read(blobId).getContents());
+            }
+
+            writeContents(join(CWD, filename), "<<<<<<< HEAD", System.lineSeparator(),
+                    currentContents, "=======", System.lineSeparator(), givenContents, ">>>>>>>");
+
+            StagingArea.add(filename);
+        }
+
+        // Commit the merge commit
+        commit("Merged " + givenBranchName + " into " + getHead().getName() + ".", given.digest());
+        if (!conflicts.isEmpty()) {
+            throw new GitletException("Encountered a merge conflict.");
+        }
     }
 
     /** Determines the latest common ancestor of two commits by:
-     * 1 - finds all common ancestors by taking the intersection of each commit's common ancestors
+     * 1 - finds all common ancestors by taking the intersection of each commit's ancestors
      * 2 - returning the commit with the latest date out of this intersection */
     public static Commit latestCommonAncestor(Commit commit1, Commit commit2) {
         Set<Commit> commonAncestors = commit1.getAllAncestors();
         commonAncestors.retainAll(commit2.getAllAncestors());
         return commonAncestors.stream().max(Comparator.comparing(Commit::getTimestamp)).get();
+    }
+
+    /**
+     * Returns the {@link ModifiedStatus} of the given file from one commit to another
+     * @param filename the file in question
+     * @param from the from commit
+     * @param to the to commit
+     * @return the modified status of the file from one commit to another
+     */
+    public static ModifiedStatus checkModifiedStatus(String filename, Commit from, Commit to) {
+        if (!from.getBlobs().containsKey(filename)) {
+            if (to.getBlobs().containsKey(filename)) return ADDED;
+            else return DNE;
+        }
+        if (!to.getBlobs().containsKey(filename)) return REMOVED;
+        if (from.getBlobs().get(filename).equals(to.getBlobs().get(filename))) {
+            return SAME;
+        }
+        return MODIFIED;
     }
 }

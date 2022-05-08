@@ -67,7 +67,7 @@ public class Main {
                     break;
                 case "commit":
                     verifyNumArguments(1, args.length - 1);
-                    Repository.commit(args[1]);
+                    Repository.commit(args[1], null);
                     break;
                 case "log":
                     Repository.log();
