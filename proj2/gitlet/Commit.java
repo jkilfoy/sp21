@@ -59,25 +59,22 @@ public class Commit implements Digestable, Serializable {
         List<Commit> trails = new LinkedList<>();
         trails.add(this);
         while (!trails.isEmpty()) {
-            // For each trail
-            ListIterator<Commit> iter = trails.listIterator();
-            while (iter.hasNext()) {
-                Commit trailHead = iter.next();
+            List<Commit> next = new LinkedList<>();
+            for (Commit trailHead : trails) {
                 if (!ancestors.contains(trailHead)) {
                     // add the commit to ancestors, then add each parent to trails
                     ancestors.add(trailHead);
                     Commit firstParent = COMMITS.read(trailHead.getParentId());
                     if (firstParent != null) {
-                        trails.add(firstParent);
+                        next.add(firstParent);
                     }
                     Commit secondParent = COMMITS.read(trailHead.getSecondParentId());
                     if (secondParent != null) {
-                        trails.add(secondParent);
+                        next.add(secondParent);
                     }
                 }
-                // Remove the commit from trails
-                iter.remove();
             }
+            trails = next;
         }
         return ancestors;
     }
@@ -85,8 +82,8 @@ public class Commit implements Digestable, Serializable {
     public String toString() {
         ZonedDateTime zdt = ZonedDateTime.ofInstant(timestamp.toInstant(), ZoneId.systemDefault());
         return "commit " + digest() + System.lineSeparator() +
-                (secondParentId != null && !"".equals(secondParentId) ?
-                        "Merge:" + shorten(parentId) + " " + shorten(secondParentId) + System.lineSeparator()
+                (!"".equals(secondParentId) ?
+                        "Merge: " + shorten(parentId) + " " + shorten(secondParentId) + System.lineSeparator()
                         : ""
                 ) +
                 "Date: " + formatter.format(timestamp) + System.lineSeparator() +
