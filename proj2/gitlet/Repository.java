@@ -309,8 +309,10 @@ public class Repository {
         TreeMap<String, String> changes = new TreeMap<>();
         TreeSet<String> conflicts = new TreeSet<>();
 
-        // Loop through all files in the given commit to find changes from split point
-        for (String filename : given.getBlobs().navigableKeySet()) {
+        // Loop through all files in both split point and given commit to find changes from split point
+        Set<String> filenames = new HashSet<>(given.getBlobs().navigableKeySet());
+        filenames.addAll(splitPoint.getBlobs().navigableKeySet());
+        for (String filename : filenames) {
             switch (checkModifiedStatus(filename, splitPoint, given)) {
                 case ADDED, MODIFIED -> changes.put(filename, given.getBlobs().get(filename));
                 case REMOVED -> changes.put(filename, "REMOVED");
