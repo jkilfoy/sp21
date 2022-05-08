@@ -372,7 +372,8 @@ public class Repository {
             }
 
             writeContents(join(CWD, filename), "<<<<<<< HEAD", System.lineSeparator(),
-                    currentContents, "=======", System.lineSeparator(), givenContents, ">>>>>>>");
+                    currentContents, System.lineSeparator(), "=======", System.lineSeparator(),
+                    givenContents, ">>>>>>>");
 
             StagingArea.add(filename);
         }
